@@ -21,8 +21,8 @@ window.addEventListener('load', event => {
   // New post form
   const newPostForm = () => {
     mainContent.innerHTML = '';
-    const form = document.createElement('form')
-    form.innerHTML = `
+    const blankForm = document.createElement('form')
+    blankForm.innerHTML = `
       <div class="form-group">
         <label>Title:</label><br>
         <input type="text" id="postTitle"><br>
@@ -31,7 +31,7 @@ window.addEventListener('load', event => {
       </div>
       <button class="btn btn-primary" id="submit-post">Submit</button>
       `
-    mainContent.appendChild(form);
+    mainContent.appendChild(blankForm);
     const submitPostBtn = document.querySelector("#submit-post");
     submitPostBtn.addEventListener('click', (event) => {
       let postTitle = document.querySelector("#postTitle").value
@@ -43,11 +43,10 @@ window.addEventListener('load', event => {
       submitNewPost(postData, event);
     });
   }
+
   newPostBtn.addEventListener('click', newPostForm);
 
-
   //Show Posts
-
   const showPosts = () => {
     allTitles.innerHTML = '';
     const postsListEl = document.createElement('ul')
@@ -69,46 +68,72 @@ window.addEventListener('load', event => {
             mainContent.appendChild(p)
             mainContent.appendChild(postActions)
             const id = post.id;
-            // document.querySelector('.delete').addEventListener('click', (event) => {
-            // const id = post.id
-            // axios.delete(`${baseURL}/posts/${id}`)
-            // .then ( response => {
-            //   showPosts();
-            // })
-            //   event.preventDefault();
-            // });
             document.querySelector('.delete').addEventListener('click', (event) => {
-              deletePost(id, event);
+              deletePost(id);
+              event.preventDefault();
             });
-            document.querySelector('.edit').addEventListener('click', () => {
-            console.log("You clicked Edit")
+            document.querySelector('.edit').addEventListener('click', (event) => {
+              mainContent.innerHTML = `
+                <div class="form-group">
+                  <label>Title:</label><br>
+                  <input type="text" id="postTitle" value="${post.title}"><br>
+                  <label>Body:</label><br>
+                  <textarea type="text" id="postContent" value="${post.content}"></textarea>
+                </div>
+                <button class="btn btn-primary" id="update-post">Update</button>
+                `
+
+                mainContent.innerHTML = `
+                <div class="form-group">
+                  <label>Title:</label><br>
+                  <input type="text" id="postTitle" value="${post.title}"><br>
+                  <label>Body:</label><br>
+                  <textarea type="text" id="postContent" value="${post.content}"></textarea>
+                </div>
+                <button class="btn btn-primary" id="update-post">Update</button>`
+
+              const updatePostBtn = document.querySelector("#update-post");
+
+              updatePostBtn.addEventListener('click', (event) => {
+                console.log(id)
+                const postData = {
+                  id,
+                  title: document.querySelector("#postTitle").value,
+                  content: document.querySelector("#postContent").value
+                };
+                editPost(id, postData);
+                event.preventDefault();
+              });
             });
-            // console.log(post.id);
+          });
         });
-      });
-    })
+      })
   }
   showPosts();
 
-
-// Create New Post
-const submitNewPost = (obj, event) => {
-  axios.post(`${baseURL}/posts`, obj)
-  .then( response => {
-    showPosts();
-  })
+  // Create New Post
+  const submitNewPost = (obj, event) => {
+    axios.post(`${baseURL}/posts`, obj)
+      .then(response => {
+        showPosts();
+      })
     event.preventDefault();
-}
+  }
 
+  // Delete Post
+  const deletePost = (id, event) => {
+    axios.delete(`${baseURL}/posts/${id}`)
+      .then(response => {
+        showPosts();
+      })
+  }
 
-// Delete Post
-const deletePost = (id, event) => {
-  axios.delete(`${baseURL}/posts/${id}`)
-  .then ( response => {
-    showPosts();
-  })
-  event.preventDefault();
-}
-
+  // Update Post
+  const editPost = (id, obj) => {
+    axios.put(`${baseURL}/posts/${id}`, obj)
+      .then(response => {
+        showPosts();
+      })
+  }
 
 });
