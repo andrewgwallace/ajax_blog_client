@@ -40,7 +40,8 @@ window.addEventListener('load', event => {
         title: postTitle,
         content: postContent
       };
-      submitNewPost(postData, event);
+      submitNewPost(postData);
+      event.preventDefault();
     });
   }
 
@@ -78,22 +79,11 @@ window.addEventListener('load', event => {
                   <label>Title:</label><br>
                   <input type="text" id="postTitle" value="${post.title}"><br>
                   <label>Body:</label><br>
-                  <textarea type="text" id="postContent" value="${post.content}"></textarea>
+                  <textarea type="text" id="postContent">${post.content}</textarea>
                 </div>
                 <button class="btn btn-primary" id="update-post">Update</button>
                 `
-
-                mainContent.innerHTML = `
-                <div class="form-group">
-                  <label>Title:</label><br>
-                  <input type="text" id="postTitle" value="${post.title}"><br>
-                  <label>Body:</label><br>
-                  <textarea type="text" id="postContent" value="${post.content}"></textarea>
-                </div>
-                <button class="btn btn-primary" id="update-post">Update</button>`
-
               const updatePostBtn = document.querySelector("#update-post");
-
               updatePostBtn.addEventListener('click', (event) => {
                 console.log(id)
                 const postData = {
@@ -112,20 +102,19 @@ window.addEventListener('load', event => {
   showPosts();
 
   // Create New Post
-  const submitNewPost = (obj, event) => {
+  const submitNewPost = (obj) => {
     axios.post(`${baseURL}/posts`, obj)
       .then(response => {
         showPosts();
-      })
-    event.preventDefault();
+      }).catch( error => { console.error( error ); });
   }
 
   // Delete Post
-  const deletePost = (id, event) => {
+  const deletePost = (id) => {
     axios.delete(`${baseURL}/posts/${id}`)
       .then(response => {
         showPosts();
-      })
+      }).catch( error => { console.error( error ); });
   }
 
   // Update Post
@@ -133,7 +122,7 @@ window.addEventListener('load', event => {
     axios.put(`${baseURL}/posts/${id}`, obj)
       .then(response => {
         showPosts();
-      })
+      }).catch( error => { console.error( error ); });
   }
 
 });
